@@ -1,0 +1,44 @@
+# nginx
+nginx:
+  build: ./nginx
+  ports:
+    - "8080:80"
+    - "443:443"
+  volumes:
+    # app
+    - ./www:/usr/share/nginx/html
+    - ./nginx/logs:/var/log
+  links:
+    - php
+
+# php
+php:
+  build: ./php
+  ports:
+    - "9000"
+  volumes:
+    #- ./php/php-fpm.conf:/usr/local/etc/php-fpm.conf
+    #- ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf
+    - ./php/logs:/usr/local/var/log
+    - ./www:/usr/share/nginx/html
+  links:
+    - mysql
+    - redis
+
+# mysql
+mysql:
+  image: ./mysql
+  ports:
+    - "127.0.0.1:3306:3306"
+  volumes:
+    - ./mysql/database:/var/lib/mysql
+  environment:
+    MYSQL_ROOT_PASSWORD: 123456
+
+# redis
+redis:
+  build: ./redis
+  ports:
+    - "127.0.0.1:6379:6379"
+  volumes:
+    - ./redis/data:/data
