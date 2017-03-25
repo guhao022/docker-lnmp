@@ -1,13 +1,13 @@
 # nginx
 nginx:
-  build: ./nginx
+  image: nginx:alpine
   ports:
-    - "8080:80"
+    - "80:80"
     - "443:443"
   volumes:
-    # app
-    - ./www:/usr/share/nginx/html
-    - ./nginx/logs:/var/log
+    - ./nginx/conf.d:/etc/nginx/conf.d
+    - /data/www/taxi:/usr/share/nginx/html
+    - ./nginx/logs:/var/log/nginx
   links:
     - php
 
@@ -17,28 +17,8 @@ php:
   ports:
     - "9000"
   volumes:
-    #- ./php/php-fpm.conf:/usr/local/etc/php-fpm.conf
-    #- ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf
-    - ./php/logs:/usr/local/var/log
-    - ./www:/usr/share/nginx/html
-  links:
-    - mysql
-    - redis
+    - ./php/logs:/var/log
+    - /data/www/taxi:/usr/share/nginx/html
 
-# mysql
-mysql:
-  image: ./mysql
-  ports:
-    - "127.0.0.1:3306:3306"
-  volumes:
-    - ./mysql/database:/var/lib/mysql
-  environment:
-    MYSQL_ROOT_PASSWORD: 123456
 
-# redis
-redis:
-  build: ./redis
-  ports:
-    - "127.0.0.1:6379:6379"
-  volumes:
-    - ./redis/data:/data
+

@@ -3,8 +3,10 @@ MAINTAINER GuHao <378999587@qq.com>
 
 ENV TZ=Asia/Shanghai
 
-RUN mkdir -p /data/www
+ADD ./source.list /etc/apt/sources.list
 
+# Install "curl", "libmemcached-dev", "libpq-dev", "libjpeg-dev",
+#         "libpng12-dev", "libfreetype6-dev", "libssl-dev", "libmcrypt-dev",
 RUN set -xe \
     && echo "构建依赖" \
     && buildDeps=" \
@@ -23,7 +25,6 @@ RUN set -xe \
         libpng12-0 \
     " \
     && echo "安装 php 以及编译构建组件所需包" \
-    && DEBIAN_FRONTEND=noninteractive \
     && apt-get update \
     && apt-get install -y ${runtimeDeps} ${buildDeps} --no-install-recommends \
     && echo "编译安装 php 组件" \
@@ -40,4 +41,14 @@ RUN set -xe \
     && rm -rf /var/cache/apt/* \
     && rm -rf /var/lib/apt/lists/*
 
-    
+
+ADD ./laravel.ini /usr/local/etc/php/conf.d
+ADD ./laravel.pool.conf /usr/local/etc/php-fpm.d/
+
+RUN usermod -u 1000 www-data
+
+WORKDIR /var/www
+
+CMD ["php-fpm"]
+
+EXPOSE 9000
